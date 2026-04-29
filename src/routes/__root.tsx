@@ -3,6 +3,19 @@ import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import appCss from "../styles.css?url";
 
+const ORG_JSONLD = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Neom Teckverse",
+  url: "https://neomteckverse.com",
+  description: "Performance-led digital marketing firm — paid media, SEO, social, brand and web engineered as one growth system.",
+  email: "hello@neomteckverse.com",
+  sameAs: [
+    "https://www.linkedin.com/company/neomteckverse",
+    "https://twitter.com/neomteckverse",
+  ],
+};
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -30,12 +43,23 @@ export const Route = createRootRoute({
       { title: "Neom Teckverse — Digital marketing engineered for growth" },
       { name: "description", content: "Neom Teckverse is a performance-led digital marketing firm. Paid media, SEO, content, brand and web — engineered as one growth system." },
       { name: "author", content: "Neom Teckverse" },
+      { name: "theme-color", content: "#0a0e2a" },
       { property: "og:title", content: "Neom Teckverse — Digital marketing engineered for growth" },
       { property: "og:description", content: "Performance-led digital marketing. Paid, organic, brand and web as one system." },
       { property: "og:type", content: "website" },
+      { property: "og:site_name", content: "Neom Teckverse" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
-    links: [{ rel: "stylesheet", href: appCss }],
+    links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "canonical", href: "https://neomteckverse.com" },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify(ORG_JSONLD),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
@@ -49,6 +73,12 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:rounded-full focus:bg-aurora focus:text-background focus:font-medium"
+        >
+          Skip to content
+        </a>
         {children}
         <Scripts />
       </body>
@@ -60,7 +90,7 @@ function RootComponent() {
   return (
     <>
       <Nav />
-      <main className="relative">
+      <main id="main" className="relative">
         <Outlet />
       </main>
       <Footer />

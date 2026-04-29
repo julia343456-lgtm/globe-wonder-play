@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 type Point = { lat: number; lng: number; label: string };
@@ -30,12 +30,30 @@ function latLngToVec3(lat: number, lng: number, radius: number) {
   );
 }
 
+const RADIUS = 2;
+
 export default function Globe() {
   const mountRef = useRef<HTMLDivElement>(null);
+  const [reduced, setReduced] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
 
   useEffect(() => {
     const mount = mountRef.current;
-    if (!mount) return;
+    if (!mount || reduced) return;
+
+    // Detect mobile/low-power
+    const isSmall = window.matchMedia("(max-width: 768px)").matches;
+    const dotCount = isSmall ? 1800 : 4500;
+    const starCount = isSmall ? 500 : 1200;
+    const dpr = isSmall ? 1 : Math.min(window.devicePixelRatio, 2);
 
     const width = mount.clientWidth;
     const height = mount.clientHeight;
@@ -44,48 +62,43 @@ export default function Globe() {
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
     camera.position.z = 5.5;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const renderer = new THREE.WebGLRenderer({ antialias: !isSmall, alpha: true, powerPreference: "high-performance" });
+    renderer.setPixelRatio(dpr);
     renderer.setSize(width, height);
     mount.appendChild(renderer.domElement);
 
     const globeGroup = new THREE.Group();
     scene.add(globeGroup);
 
-    const RADIUS = 2;
+    // Core sphere
+    globeGroup.add(
+      new THREE.Mesh(
+        new THREE.SphereGeometry(RADIUS * 0.98, 64, 64),
+        new THREE.MeshBasicMaterial({ color: new THREE.Color("#0a0e2a"), transparent: true, opacity: 0.85 }),
+      ),
+    );
 
-    // Inner glowing core sphere
-    const coreGeo = new THREE.SphereGeometry(RADIUS * 0.98, 64, 64);
-    const coreMat = new THREE.MeshBasicMaterial({
-      color: new THREE.Color("#0a0e2a"),
-      transparent: true,
-      opacity: 0.85,
-    });
-    globeGroup.add(new THREE.Mesh(coreGeo, coreMat));
-
-    // Wireframe latitude/longitude
+    // Wireframe
     const wireGeo = new THREE.SphereGeometry(RADIUS, 36, 24);
-    const wireMat = new THREE.LineBasicMaterial({
-      color: new THREE.Color("#22d3ee"),
-      transparent: true,
-      opacity: 0.18,
-    });
-    globeGroup.add(new THREE.LineSegments(new THREE.WireframeGeometry(wireGeo), wireMat));
+    globeGroup.add(
+      new THREE.LineSegments(
+        new THREE.WireframeGeometry(wireGeo),
+        new THREE.LineBasicMaterial({ color: "#22d3ee", transparent: true, opacity: 0.18 }),
+      ),
+    );
 
-    // Dotted continent surface (procedural fibonacci sphere distribution + lat/lng-based mask)
+    // Dotted continents
     const dotsGeo = new THREE.BufferGeometry();
     const dotPositions: number[] = [];
     const dotColors: number[] = [];
-    const N = 4500;
     const cyan = new THREE.Color("#67e8f9");
     const magenta = new THREE.Color("#f0abfc");
-    for (let i = 0; i < N; i++) {
-      const phi = Math.acos(1 - (2 * (i + 0.5)) / N);
+    for (let i = 0; i < dotCount; i++) {
+      const phi = Math.acos(1 - (2 * (i + 0.5)) / dotCount);
       const theta = Math.PI * (1 + Math.sqrt(5)) * i;
       const x = Math.cos(theta) * Math.sin(phi);
       const y = Math.sin(theta) * Math.sin(phi);
       const z = Math.cos(phi);
-      // Pseudo-continent mask via noisy bands
       const lat = Math.asin(y) * (180 / Math.PI);
       const lng = Math.atan2(z, x) * (180 / Math.PI);
       const n =
@@ -100,17 +113,14 @@ export default function Globe() {
     }
     dotsGeo.setAttribute("position", new THREE.Float32BufferAttribute(dotPositions, 3));
     dotsGeo.setAttribute("color", new THREE.Float32BufferAttribute(dotColors, 3));
-    const dotsMat = new THREE.PointsMaterial({
-      size: 0.025,
-      vertexColors: true,
-      transparent: true,
-      opacity: 0.95,
-      sizeAttenuation: true,
-    });
-    globeGroup.add(new THREE.Points(dotsGeo, dotsMat));
+    globeGroup.add(
+      new THREE.Points(
+        dotsGeo,
+        new THREE.PointsMaterial({ size: 0.025, vertexColors: true, transparent: true, opacity: 0.95, sizeAttenuation: true }),
+      ),
+    );
 
-    // Atmosphere glow (back-side shader-ish via additive sphere)
-    const atmoGeo = new THREE.SphereGeometry(RADIUS * 1.18, 64, 64);
+    // Atmosphere
     const atmoMat = new THREE.ShaderMaterial({
       uniforms: { uColor: { value: new THREE.Color("#22d3ee") } },
       vertexShader: `
@@ -130,36 +140,29 @@ export default function Globe() {
       side: THREE.BackSide,
       transparent: true,
     });
-    scene.add(new THREE.Mesh(atmoGeo, atmoMat));
+    scene.add(new THREE.Mesh(new THREE.SphereGeometry(RADIUS * 1.18, 64, 64), atmoMat));
 
-    // City points
+    // City points + halos
     const pointMeshes: THREE.Mesh[] = [];
     POINTS.forEach((p) => {
       const v = latLngToVec3(p.lat, p.lng, RADIUS * 1.01);
-      const geo = new THREE.SphereGeometry(0.04, 12, 12);
-      const mat = new THREE.MeshBasicMaterial({ color: "#f0abfc" });
-      const mesh = new THREE.Mesh(geo, mat);
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.04, 12, 12), new THREE.MeshBasicMaterial({ color: "#f0abfc" }));
       mesh.position.copy(v);
       globeGroup.add(mesh);
       pointMeshes.push(mesh);
 
-      // halo ring
-      const ringGeo = new THREE.RingGeometry(0.06, 0.09, 24);
-      const ringMat = new THREE.MeshBasicMaterial({
-        color: "#22d3ee",
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.6,
-      });
-      const ring = new THREE.Mesh(ringGeo, ringMat);
+      const ring = new THREE.Mesh(
+        new THREE.RingGeometry(0.06, 0.09, 24),
+        new THREE.MeshBasicMaterial({ color: "#22d3ee", side: THREE.DoubleSide, transparent: true, opacity: 0.6 }),
+      );
       ring.position.copy(v);
       ring.lookAt(0, 0, 0);
       globeGroup.add(ring);
     });
 
-    // Arcs
-    const arcLines: { line: THREE.Line; total: number; offset: number }[] = [];
-    ARCS.forEach(([a, b], idx) => {
+    // Arcs + traveling pulses (kept in separate arrays — fixes the latent type bug)
+    const pulses: { mesh: THREE.Mesh; curve: THREE.QuadraticBezierCurve3; offset: number }[] = [];
+    ARCS.forEach(([a, b]) => {
       const start = latLngToVec3(POINTS[a].lat, POINTS[a].lng, RADIUS * 1.01);
       const end = latLngToVec3(POINTS[b].lat, POINTS[b].lng, RADIUS * 1.01);
       const mid = start.clone().add(end).multiplyScalar(0.5);
@@ -177,45 +180,27 @@ export default function Globe() {
         colors[i * 3 + 2] = c.b;
       }
       geo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
-      const mat = new THREE.LineBasicMaterial({
-        vertexColors: true,
-        transparent: true,
-        opacity: 0.9,
-      });
-      const line = new THREE.Line(geo, mat);
-      globeGroup.add(line);
-      arcLines.push({ line, total: points.length, offset: idx * 0.3 });
+      globeGroup.add(new THREE.Line(geo, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.9 })));
 
-      // traveling pulse
-      const pulseGeo = new THREE.SphereGeometry(0.05, 12, 12);
-      const pulseMat = new THREE.MeshBasicMaterial({ color: "#ffffff" });
-      const pulse = new THREE.Mesh(pulseGeo, pulseMat);
-      (pulse as any).userData = { curve, offset: Math.random() };
+      const pulse = new THREE.Mesh(new THREE.SphereGeometry(0.05, 12, 12), new THREE.MeshBasicMaterial({ color: "#ffffff" }));
       globeGroup.add(pulse);
-      arcLines.push({ line: pulse as unknown as THREE.Line, total: 0, offset: 0 });
+      pulses.push({ mesh: pulse, curve, offset: Math.random() });
     });
 
-    // Star field background
+    // Stars
     const starsGeo = new THREE.BufferGeometry();
     const starPos: number[] = [];
-    for (let i = 0; i < 1200; i++) {
+    for (let i = 0; i < starCount; i++) {
       const r = 30 + Math.random() * 40;
       const theta = Math.random() * Math.PI * 2;
       const phi = Math.acos(2 * Math.random() - 1);
-      starPos.push(
-        r * Math.sin(phi) * Math.cos(theta),
-        r * Math.sin(phi) * Math.sin(theta),
-        r * Math.cos(phi),
-      );
+      starPos.push(r * Math.sin(phi) * Math.cos(theta), r * Math.sin(phi) * Math.sin(theta), r * Math.cos(phi));
     }
     starsGeo.setAttribute("position", new THREE.Float32BufferAttribute(starPos, 3));
-    const stars = new THREE.Points(
-      starsGeo,
-      new THREE.PointsMaterial({ color: "#ffffff", size: 0.08, transparent: true, opacity: 0.7 }),
-    );
+    const stars = new THREE.Points(starsGeo, new THREE.PointsMaterial({ color: "#ffffff", size: 0.08, transparent: true, opacity: 0.7 }));
     scene.add(stars);
 
-    // Interaction: drag to rotate, auto-spin, momentum
+    // Interaction state
     const state = {
       rotX: 0.2,
       rotY: 0,
@@ -224,7 +209,7 @@ export default function Globe() {
       dragging: false,
       lastX: 0,
       lastY: 0,
-      hoverLerp: 1, // slowdown factor
+      hoverLerp: 1,
     };
 
     const onDown = (e: PointerEvent) => {
@@ -253,6 +238,12 @@ export default function Globe() {
       state.hoverLerp = 1;
       onUp();
     };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") state.velY = -0.05;
+      if (e.key === "ArrowRight") state.velY = 0.05;
+      if (e.key === "ArrowUp") state.velX = -0.05;
+      if (e.key === "ArrowDown") state.velX = 0.05;
+    };
 
     mount.style.cursor = "grab";
     mount.addEventListener("pointerdown", onDown);
@@ -260,47 +251,47 @@ export default function Globe() {
     window.addEventListener("pointerup", onUp);
     mount.addEventListener("pointerenter", onEnter);
     mount.addEventListener("pointerleave", onLeave);
+    mount.addEventListener("keydown", onKey);
+
+    // IntersectionObserver — pause RAF when offscreen
+    let visible = true;
+    const io = new IntersectionObserver(
+      (entries) => {
+        visible = entries[0]?.isIntersecting ?? false;
+      },
+      { threshold: 0.01 },
+    );
+    io.observe(mount);
 
     let raf = 0;
     let t = 0;
     const animate = () => {
+      raf = requestAnimationFrame(animate);
+      if (!visible) return;
       t += 0.016;
-      // momentum decay
       if (!state.dragging) {
         state.velY = state.velY * 0.96 + 0.0025 * state.hoverLerp * 0.04;
         state.velX *= 0.92;
         state.rotY += state.velY;
         state.rotX += state.velX;
       }
-      // clamp tilt
       state.rotX = Math.max(-0.9, Math.min(0.9, state.rotX));
       globeGroup.rotation.y = state.rotY;
       globeGroup.rotation.x = state.rotX;
 
-      // pulse city halos
-      pointMeshes.forEach((m, i) => {
-        const s = 1 + Math.sin(t * 2 + i) * 0.2;
-        m.scale.setScalar(s);
-      });
+      pointMeshes.forEach((m, i) => m.scale.setScalar(1 + Math.sin(t * 2 + i) * 0.2));
 
-      // animate traveling arc pulses
-      globeGroup.children.forEach((c) => {
-        if ((c as any).userData?.curve) {
-          const u = (((c as any).userData.offset + t * 0.15) % 1);
-          const p = (c as any).userData.curve.getPoint(u);
-          c.position.copy(p);
-        }
+      pulses.forEach((p) => {
+        const u = (p.offset + t * 0.15) % 1;
+        p.mesh.position.copy(p.curve.getPoint(u));
       });
 
       stars.rotation.y += 0.0003;
-
       renderer.render(scene, camera);
-      raf = requestAnimationFrame(animate);
     };
     animate();
 
     const onResize = () => {
-      if (!mount) return;
       const w = mount.clientWidth;
       const h = mount.clientHeight;
       renderer.setSize(w, h);
@@ -311,20 +302,46 @@ export default function Globe() {
 
     return () => {
       cancelAnimationFrame(raf);
+      io.disconnect();
       window.removeEventListener("resize", onResize);
       mount.removeEventListener("pointerdown", onDown);
       window.removeEventListener("pointermove", onMove);
       window.removeEventListener("pointerup", onUp);
       mount.removeEventListener("pointerenter", onEnter);
       mount.removeEventListener("pointerleave", onLeave);
+      mount.removeEventListener("keydown", onKey);
       renderer.dispose();
-      mount.removeChild(renderer.domElement);
+      if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [reduced]);
+
+  if (reduced) {
+    // Static, accessible fallback — pure CSS, no WebGL
+    return (
+      <div
+        role="img"
+        aria-label="Stylised globe representing Neom Teckverse's global reach"
+        className="relative w-full h-full flex items-center justify-center"
+      >
+        <div className="relative aspect-square w-[80%] rounded-full border border-primary/40 bg-card-gradient overflow-hidden">
+          <div className="absolute inset-0 grid-bg opacity-50" />
+          <div className="absolute inset-8 rounded-full border border-primary/20" />
+          <div className="absolute inset-16 rounded-full border border-accent/20" />
+          <div className="absolute inset-0 rounded-full" style={{ background: "var(--gradient-radial-glow)" }} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative w-full h-full">
-      <div ref={mountRef} className="absolute inset-0 select-none touch-none" />
+      <div
+        ref={mountRef}
+        tabIndex={0}
+        role="application"
+        aria-label="Interactive 3D globe — drag to rotate, arrow keys to spin"
+        className="absolute inset-0 select-none touch-none focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-full"
+      />
       <div className="pointer-events-none absolute inset-0 rounded-full" style={{ background: "var(--gradient-radial-glow)" }} />
     </div>
   );

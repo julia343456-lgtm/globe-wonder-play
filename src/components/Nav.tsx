@@ -51,8 +51,10 @@ export default function Nav() {
           </Link>
           <button
             onClick={() => setOpen((o) => !o)}
-            className="lg:hidden flex flex-col gap-1.5 p-2"
-            aria-label="Menu"
+            className="lg:hidden flex flex-col gap-1.5 p-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
+            aria-label={open ? "Close menu" : "Open menu"}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
           >
             <span className={`h-px w-5 bg-foreground transition-transform ${open ? "rotate-45 translate-y-[3px]" : ""}`} />
             <span className={`h-px w-5 bg-foreground transition-opacity ${open ? "opacity-0" : ""}`} />
@@ -62,7 +64,7 @@ export default function Nav() {
       </div>
 
       {open && (
-        <div className="lg:hidden mt-4 pb-4 flex flex-col gap-1 max-w-7xl mx-auto">
+        <div id="mobile-menu" className="lg:hidden mt-4 pb-4 flex flex-col gap-1 max-w-7xl mx-auto">
           {LINKS.map((l) => (
             <Link
               key={l.to}
