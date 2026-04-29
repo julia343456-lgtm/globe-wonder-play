@@ -1,38 +1,70 @@
+import { Link } from "@tanstack/react-router";
+
 export default function Footer() {
   return (
-    <footer id="contact" className="relative py-24 px-6 md:px-10 border-t border-border mt-20">
+    <footer className="relative py-20 px-6 md:px-10 border-t border-border mt-20">
       <div className="max-w-7xl mx-auto">
-        <div className="grid md:grid-cols-[1.5fr_1fr_1fr] gap-12 mb-16">
+        <div className="grid md:grid-cols-[1.6fr_1fr_1fr_1fr] gap-12 mb-16">
           <div>
-            <div className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">[ contact ]</div>
-            <h3 className="font-display text-5xl md:text-6xl leading-[0.95] tracking-tight">
-              Got a world<br /> to <span className="text-aurora italic">render?</span>
-            </h3>
-            <a
-              href="mailto:hello@zaxis.studio"
-              className="inline-flex items-center gap-3 mt-8 px-6 py-3 rounded-full bg-aurora text-background font-medium hover:scale-[1.03] transition-transform"
+            <Link to="/" className="flex items-center gap-2.5 mb-6">
+              <span className="flex h-8 w-8 items-center justify-center rounded-md bg-aurora">
+                <span className="font-mono text-xs font-bold text-background">N</span>
+              </span>
+              <span className="font-display text-xl">
+                Neom <span className="text-aurora italic">Teckverse</span>
+              </span>
+            </Link>
+            <p className="text-muted-foreground max-w-xs leading-relaxed">
+              A performance-led digital marketing firm engineering growth across paid, organic, and brand.
+            </p>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-3 mt-6 px-5 py-2.5 rounded-full bg-aurora text-background font-medium hover:scale-[1.03] transition-transform"
             >
-              hello@zaxis.studio →
-            </a>
+              Start a project →
+            </Link>
           </div>
-          <div>
-            <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">studio</div>
-            <ul className="space-y-2 text-foreground/80">
-              <li>About</li><li>Process</li><li>Careers</li><li>Press</li>
-            </ul>
-          </div>
-          <div>
-            <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">elsewhere</div>
-            <ul className="space-y-2 text-foreground/80">
-              <li>Twitter</li><li>Are.na</li><li>Dribbble</li><li>GitHub</li>
-            </ul>
-          </div>
+          <FooterCol title="Services" links={[
+            { label: "Performance Marketing", to: "/services" },
+            { label: "SEO & Content", to: "/services" },
+            { label: "Social & Creative", to: "/services" },
+            { label: "Brand & Web", to: "/services" },
+          ]} />
+          <FooterCol title="Studio" links={[
+            { label: "About", to: "/about" },
+            { label: "Process", to: "/process" },
+            { label: "Work", to: "/work" },
+            { label: "Insights", to: "/insights" },
+          ]} />
+          <FooterCol title="Elsewhere" links={[
+            { label: "LinkedIn", to: "/contact" },
+            { label: "Twitter / X", to: "/contact" },
+            { label: "Instagram", to: "/contact" },
+            { label: "Behance", to: "/contact" },
+          ]} />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border font-mono text-xs text-muted-foreground">
-          <span>© 2026 Z·Axis Studio — built along the third dimension</span>
-          <span>Berlin · NYC · Tokyo</span>
+          <span>© {new Date().getFullYear()} Neom Teckverse — growth along the third axis</span>
+          <span>hello@neomteckverse.com · Berlin · NYC · Tokyo</span>
         </div>
       </div>
     </footer>
+  );
+}
+
+function FooterCol({ title, links }: { title: string; links: { label: string; to: string }[] }) {
+  return (
+    <div>
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">{title}</div>
+      <ul className="space-y-2">
+        {links.map((l) => (
+          <li key={l.label}>
+            <Link to={l.to} className="text-foreground/80 hover:text-aurora transition-colors">
+              {l.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
