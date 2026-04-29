@@ -42,7 +42,7 @@ export const Route = createFileRoute("/work/$slug")({
 });
 
 function CaseStudy() {
-  const { project } = Route.useLoaderData();
+  const { project } = Route.useLoaderData() as { project: import("@/data/projects").Project };
   const idx = PROJECTS.findIndex((p) => p.slug === project.slug);
   const next = PROJECTS[(idx + 1) % PROJECTS.length];
 
