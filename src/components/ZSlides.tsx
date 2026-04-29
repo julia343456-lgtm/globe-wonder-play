@@ -1,42 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-
-const SLIDES = [
-  {
-    n: "01",
-    title: "Aurora OS",
-    cat: "Spatial product",
-    blurb: "An operating system for ambient computing. We designed motion, sound, and the entire shell language.",
-    accent: "from-cyan-400 to-fuchsia-400",
-  },
-  {
-    n: "02",
-    title: "Helio Finance",
-    cat: "Realtime dashboard",
-    blurb: "A globe-anchored trading view tracking 4M positions per second across continents.",
-    accent: "from-fuchsia-400 to-amber-300",
-  },
-  {
-    n: "03",
-    title: "Orbiter Studio",
-    cat: "Brand system",
-    blurb: "Identity, motion, and a generative type system for a satellite imaging startup.",
-    accent: "from-amber-300 to-cyan-400",
-  },
-  {
-    n: "04",
-    title: "Nimbus Health",
-    cat: "Spatial interface",
-    blurb: "A volumetric patient record — radiology, vitals, and history rendered as one navigable space.",
-    accent: "from-cyan-400 to-emerald-300",
-  },
-  {
-    n: "05",
-    title: "Vector Atlas",
-    cat: "Data viz",
-    blurb: "100M-vertex globe of climate signals, scrubbable across decades. Built on streaming WebGL.",
-    accent: "from-emerald-300 to-fuchsia-400",
-  },
-];
+import { Link } from "@tanstack/react-router";
+import { PROJECTS } from "@/data/projects";
 
 export default function ZSlides() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -71,49 +35,41 @@ export default function ZSlides() {
       id="deck"
       ref={sectionRef}
       className="relative"
-      style={{ height: `${SLIDES.length * 90}vh` }}
+      style={{ height: `${PROJECTS.length * 90}vh` }}
     >
       <div className="sticky top-0 h-screen overflow-hidden" style={{ perspective: "1800px" }}>
-        {/* Header */}
         <div className="absolute top-0 left-0 right-0 z-20 px-6 md:px-10 pt-28 pointer-events-none">
           <div className="max-w-7xl mx-auto flex items-end justify-between">
             <div>
-              <div className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-3">[ deck · z-axis ]</div>
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-3">[ work · z-axis ]</div>
               <h2 className="font-display text-4xl md:text-5xl tracking-tight">
                 Selected <span className="text-aurora italic">work.</span>
               </h2>
             </div>
             <div className="hidden md:block font-mono text-xs text-muted-foreground">
-              {String(Math.min(SLIDES.length, Math.floor(progress * SLIDES.length) + 1)).padStart(2, "0")}
+              {String(Math.min(PROJECTS.length, Math.floor(progress * PROJECTS.length) + 1)).padStart(2, "0")}
               <span className="mx-1">/</span>
-              {String(SLIDES.length).padStart(2, "0")}
+              {String(PROJECTS.length).padStart(2, "0")}
             </div>
           </div>
         </div>
 
-        {/* Track */}
         <div className="absolute inset-0 flex items-center" style={{ transformStyle: "preserve-3d" }}>
           <div
             ref={trackRef}
             className="flex items-center gap-10 px-[15vw] will-change-transform"
             style={{ transformStyle: "preserve-3d" }}
           >
-            {SLIDES.map((s, i) => {
-              return (
-                <ZCard key={s.n} index={i} progress={progress} total={SLIDES.length} {...s} />
-              );
-            })}
+            {PROJECTS.map((s, i) => (
+              <ZCard key={s.slug} index={i} progress={progress} total={PROJECTS.length} project={s} />
+            ))}
             <div className="shrink-0 w-[10vw]" />
           </div>
         </div>
 
-        {/* Progress bar */}
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 w-[60vw] max-w-md">
           <div className="h-px bg-border relative overflow-hidden">
-            <div
-              className="absolute inset-y-0 left-0 bg-aurora"
-              style={{ width: `${progress * 100}%` }}
-            />
+            <div className="absolute inset-y-0 left-0 bg-aurora" style={{ width: `${progress * 100}%` }} />
           </div>
           <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.3em] text-muted-foreground text-center">
             scroll → flies forward
@@ -128,23 +84,15 @@ function ZCard({
   index,
   progress,
   total,
-  n,
-  title,
-  cat,
-  blurb,
+  project,
 }: {
   index: number;
   progress: number;
   total: number;
-  n: string;
-  title: string;
-  cat: string;
-  blurb: string;
-  accent: string;
+  project: (typeof PROJECTS)[number];
 }) {
-  // Each card has its "active" point — when card is centered horizontally
   const center = (index + 0.5) / total;
-  const dist = progress - center; // -ve: not yet, +ve: passed
+  const dist = progress - center;
   const z = Math.max(-600, -Math.abs(dist) * 1800);
   const rotY = dist * 18;
   const opacity = 1 - Math.min(0.6, Math.abs(dist) * 1.4);
@@ -166,28 +114,32 @@ function ZCard({
 
       <div className="relative h-full p-8 md:p-10 flex flex-col justify-between">
         <div className="flex items-start justify-between">
-          <span className="font-mono text-xs text-muted-foreground">{n} / {String(total).padStart(2, "0")}</span>
+          <span className="font-mono text-xs text-muted-foreground">{project.n} / {String(total).padStart(2, "0")}</span>
           <span className="font-mono text-[10px] uppercase tracking-[0.25em] px-3 py-1 rounded-full border border-primary/40 text-primary">
-            {cat}
+            {project.cat}
           </span>
         </div>
 
         <div className="flex-1 flex items-center">
           <h3 className="font-display text-5xl md:text-6xl lg:text-7xl leading-[0.95] tracking-tight">
-            {title}
+            {project.title}
           </h3>
         </div>
 
         <div>
-          <p className="text-muted-foreground leading-relaxed mb-6 max-w-sm">{blurb}</p>
+          <p className="text-muted-foreground leading-relaxed mb-6 max-w-sm">{project.blurb}</p>
           <div className="flex items-center justify-between">
-            <button className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-foreground">
+            <Link
+              to="/work/$slug"
+              params={{ slug: project.slug }}
+              className="group inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-foreground"
+            >
               <span className="relative">
                 Case study
                 <span className="absolute left-0 -bottom-1 h-px w-full bg-aurora origin-left scale-x-0 group-hover:scale-x-100 transition-transform" />
               </span>
               <span>→</span>
-            </button>
+            </Link>
             <div className="h-10 w-10 rounded-full bg-aurora opacity-80" />
           </div>
         </div>
