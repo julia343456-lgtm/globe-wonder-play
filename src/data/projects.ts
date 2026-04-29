@@ -1,4 +1,4 @@
-export const PROJECTS = [
+export const PROJECTS: Project[] = [
   {
     slug: "aurora-dtc",
     n: "01",
