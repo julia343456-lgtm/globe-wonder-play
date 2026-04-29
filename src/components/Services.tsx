@@ -1,33 +1,34 @@
 import { motion } from "framer-motion";
+import { Link } from "@tanstack/react-router";
 
 const SERVICES = [
   {
     n: "01",
-    title: "Spatial interfaces",
-    desc: "WebGL, three.js and shader-driven UI that gives flat pixels weight, depth, and motion.",
-    tags: ["three.js", "GLSL", "R3F"],
+    title: "Performance marketing",
+    desc: "Paid search, paid social, programmatic and retail media — measured to the cent, optimized weekly.",
+    tags: ["Meta", "Google", "TikTok", "Amazon"],
   },
   {
     n: "02",
-    title: "Product engineering",
-    desc: "End-to-end React and TypeScript builds — performant by default, type-safe to the edge.",
-    tags: ["React", "TS", "Edge"],
+    title: "SEO & content",
+    desc: "Topical authority, technical SEO, and a content engine that compounds quarter over quarter.",
+    tags: ["Technical", "Content", "Digital PR"],
   },
   {
     n: "03",
-    title: "Brand systems",
-    desc: "Design systems with personality. Tokens, motion, sound and identity that scale together.",
-    tags: ["Tokens", "Motion", "Identity"],
+    title: "Social & creative",
+    desc: "Always-on social, creator partnerships, and a weekly creative rhythm that fuels paid and organic.",
+    tags: ["TikTok", "IG", "YouTube", "Creators"],
   },
   {
     n: "04",
-    title: "Data visualization",
-    desc: "Globes, graphs, and live dashboards. Make billions of rows feel intuitive and alive.",
-    tags: ["D3", "WebGL", "Realtime"],
+    title: "Brand & web",
+    desc: "Identity, messaging, motion, and high-conversion sites — the surfaces your growth runs on.",
+    tags: ["Brand", "Web", "Motion", "Copy"],
   },
 ];
 
-export default function Services() {
+export default function Services({ headingOnly = false }: { headingOnly?: boolean }) {
   return (
     <section id="services" className="relative py-32 px-6 md:px-10">
       <div className="max-w-7xl mx-auto">
@@ -35,12 +36,12 @@ export default function Services() {
           <div>
             <div className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-4">[ services ]</div>
             <h2 className="font-display text-5xl md:text-6xl tracking-tight max-w-2xl">
-              Four orbits of <span className="text-aurora italic">craft.</span>
+              Four orbits of <span className="text-aurora italic">growth.</span>
             </h2>
           </div>
           <p className="max-w-sm text-muted-foreground">
-            We work in tight, senior pods. No layers, no slowdowns — just engineers and designers shipping at the
-            speed of thought.
+            We work in tight, senior pods. No layers, no slowdowns — just strategists, marketers and engineers
+            shipping at the speed of your roadmap.
           </p>
         </div>
 
@@ -71,6 +72,17 @@ export default function Services() {
             </motion.div>
           ))}
         </div>
+
+        {headingOnly && (
+          <div className="mt-12 text-center">
+            <Link
+              to="/services"
+              className="inline-flex items-center gap-2 font-mono text-sm text-primary hover:text-foreground transition-colors"
+            >
+              Explore all services →
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );
