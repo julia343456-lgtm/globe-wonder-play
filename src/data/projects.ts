@@ -89,6 +89,15 @@ export const PROJECTS = [
     summary:
       "A weekly creative rhythm, a stable of 24 creators, and a paid amplification model that turned organic wins into revenue.",
   },
-] as const;
+];
 
-export type Project = (typeof PROJECTS)[number];
+export type Project = {
+  slug: string;
+  n: string;
+  title: string;
+  cat: string;
+  blurb: string;
+  metrics: { k: string; v: string }[];
+  services: string[];
+  summary: string;
+};
