@@ -1,26 +1,38 @@
 import { createFileRoute } from "@tanstack/react-router";
+import Nav from "@/components/Nav";
+import Hero from "@/components/Hero";
+import Services from "@/components/Services";
+import ZSlides from "@/components/ZSlides";
+import Footer from "@/components/Footer";
 
 export const Route = createFileRoute("/")({
   component: Index,
+  head: () => ({
+    meta: [
+      { title: "Z·Axis — Spatial product studio" },
+      {
+        name: "description",
+        content:
+          "Z·Axis is a spatial product studio designing interfaces with depth — interactive globes, WebGL dashboards, and brand systems in motion.",
+      },
+      { property: "og:title", content: "Z·Axis — Spatial product studio" },
+      {
+        property: "og:description",
+        content:
+          "Interactive 3D experiences, WebGL data visualization, and motion-rich brand systems.",
+      },
+    ],
+  }),
 });
 
-// IMPORTANT: Replace this placeholder. For sites with multiple pages (About, Services, Contact, etc.),
-// create separate route files (about.tsx, services.tsx, contact.tsx) — don't put all pages in this file.
-function PlaceholderIndex() {
-  return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
-  );
-}
-
 function Index() {
-  return <PlaceholderIndex />;
+  return (
+    <main className="relative">
+      <Nav />
+      <Hero />
+      <Services />
+      <ZSlides />
+      <Footer />
+    </main>
+  );
 }
