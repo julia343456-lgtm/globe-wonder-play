@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
-import Globe from "./Globe";
+import Globe from "./GlobeLazy";
 
 export default function Hero() {
   return (
