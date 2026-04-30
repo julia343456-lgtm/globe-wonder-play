@@ -8,9 +8,9 @@ export const Route = createFileRoute("/services")({
   head: () => ({
     meta: [
       { title: "Services — Neom Teckverse" },
-      { name: "description", content: "Performance marketing, SEO & content, social & creative, brand & web. Four orbits of growth, one operating model." },
+      { name: "description", content: "Performance marketing, SEO & content, social & creative, brand & web. Pricing from $25k. Senior pods, weekly cadence, no layered teams." },
       { property: "og:title", content: "Services — Neom Teckverse" },
-      { property: "og:description", content: "Performance marketing, SEO, social, brand and web — engineered as one growth system." },
+      { property: "og:description", content: "Four services. One senior pod. Pricing from $25k — sprint, retainer or enterprise." },
     ],
   }),
 });
@@ -147,7 +147,7 @@ function ServicesPage() {
                     p.featured ? "bg-aurora text-background" : "border border-border text-foreground hover:border-primary/50"
                   }`}
                 >
-                  Talk to us →
+                  Start a project →
                 </Link>
               </div>
             ))}

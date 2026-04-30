@@ -36,11 +36,11 @@ export default function Footer() {
             { label: "Work", to: "/work" },
             { label: "Insights", to: "/insights" },
           ]} />
-          <FooterCol title="Elsewhere" links={[
-            { label: "LinkedIn", to: "/contact" },
-            { label: "Twitter / X", to: "/contact" },
-            { label: "Instagram", to: "/contact" },
-            { label: "Behance", to: "/contact" },
+          <FooterColExternal title="Elsewhere" links={[
+            { label: "LinkedIn", href: "https://www.linkedin.com/company/neomteckverse" },
+            { label: "Twitter / X", href: "https://twitter.com/neomteckverse" },
+            { label: "Instagram", href: "https://www.instagram.com/neomteckverse" },
+            { label: "Behance", href: "https://www.behance.net/neomteckverse" },
           ]} />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-border font-mono text-xs text-muted-foreground">
@@ -62,6 +62,28 @@ function FooterCol({ title, links }: { title: string; links: { label: string; to
             <Link to={l.to} className="text-foreground/80 hover:text-aurora transition-colors">
               {l.label}
             </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function FooterColExternal({ title, links }: { title: string; links: { label: string; href: string }[] }) {
+  return (
+    <div>
+      <div className="font-mono text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">{title}</div>
+      <ul className="space-y-2">
+        {links.map((l) => (
+          <li key={l.label}>
+            <a
+              href={l.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground/80 hover:text-aurora transition-colors"
+            >
+              {l.label} <span aria-hidden="true">↗</span>
+            </a>
           </li>
         ))}
       </ul>
