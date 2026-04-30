@@ -2,6 +2,10 @@ import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/r
 import Nav from "@/components/Nav";
 import Footer from "@/components/Footer";
 import appCss from "../styles.css?url";
+import ogImage from "@/assets/og-image.jpg";
+
+const SITE_URL = "https://neomteckverse.com";
+const OG_IMAGE_URL = `${SITE_URL}${ogImage}`;
 
 const ORG_JSONLD = {
   "@context": "https://schema.org",
@@ -51,8 +55,12 @@ export const Route = createRootRoute({
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Neom Teckverse — Digital marketing engineered for growth" },
       { name: "twitter:description", content: "Neom Teckverse is a performance-led digital marketing firm. Paid media, SEO, content, brand and web — engineered as one growth system." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f245dee1-3db8-4984-8302-e2e683d70fd3/id-preview-e68bbeca--9a9f261f-a9d8-46c6-9437-cc8799cb0465.lovable.app-1777485217666.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/f245dee1-3db8-4984-8302-e2e683d70fd3/id-preview-e68bbeca--9a9f261f-a9d8-46c6-9437-cc8799cb0465.lovable.app-1777485217666.png" },
+      { property: "og:image", content: OG_IMAGE_URL },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+      { property: "og:image:alt", content: "Neom Teckverse — digital marketing engineered for growth" },
+      { name: "twitter:image", content: OG_IMAGE_URL },
+      { name: "twitter:image:alt", content: "Neom Teckverse — digital marketing engineered for growth" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
