@@ -155,7 +155,7 @@ function ContactPage() {
                   className="group relative w-full inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-aurora text-background font-medium hover:scale-[1.01] transition-transform disabled:opacity-60 disabled:hover:scale-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
                 >
                   <span className="absolute inset-0 rounded-full bg-aurora blur-xl opacity-50 group-hover:opacity-80 transition-opacity" />
-                  <span className="relative">{status === "loading" ? "Sending…" : "Send brief"}</span>
+                  <span className="relative">{status === "loading" ? "Sending…" : "Start a project"}</span>
                   <span className="relative">→</span>
                 </button>
               </form>
@@ -167,10 +167,10 @@ function ContactPage() {
             <Block title="Response time" body="Within 24 hours, every working day." />
             <Block title="Studios" body="Berlin · NYC · Tokyo · Remote-first" />
             <div className="p-6 rounded-2xl border border-border bg-surface/30">
-              <div className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-3">Now booking</div>
-              <div className="font-display text-2xl mb-2">Q3 — 2 slots left</div>
+              <div className="font-mono text-xs uppercase tracking-[0.3em] text-primary mb-3">Capacity</div>
+              <div className="font-display text-2xl mb-2">Currently booking</div>
               <p className="text-muted-foreground text-sm">
-                We take on a maximum of 8 active engagements at once. Currently 6 of 8 filled.
+                We cap active engagements to keep every team senior-led. Reach out and we'll tell you the next available start date.
               </p>
             </div>
           </div>

@@ -11,9 +11,9 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Neom Teckverse — Digital marketing engineered for growth" },
-      { name: "description", content: "Performance marketing, SEO, social, brand and web — engineered as one growth system by Neom Teckverse." },
+      { name: "description", content: "Neom Teckverse is a digital marketing firm engineering paid, organic, brand and web as one compounding growth system. $84M+ revenue driven, 4.1× avg ROAS." },
       { property: "og:title", content: "Neom Teckverse — Digital marketing engineered for growth" },
-      { property: "og:description", content: "Performance marketing, SEO, social, brand and web — engineered as one growth system." },
+      { property: "og:description", content: "Digital marketing as one compounding system. $84M+ driven, 4.1× ROAS, 120+ brands shipped." },
     ],
   }),
 });

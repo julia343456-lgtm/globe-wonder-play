@@ -9,9 +9,9 @@ export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
       { title: "About — Neom Teckverse" },
-      { name: "description", content: "Neom Teckverse is a senior, distributed digital marketing firm building growth as one integrated system." },
+      { name: "description", content: "Founded in 2017. 28 senior operators across Berlin, NYC and Tokyo. Meet the team behind Neom Teckverse and the principles we ship by." },
       { property: "og:title", content: "About — Neom Teckverse" },
-      { property: "og:description", content: "Senior, distributed, integrated. The story of Neom Teckverse." },
+      { property: "og:description", content: "Senior, distributed, integrated. Meet the people behind Neom Teckverse." },
     ],
   }),
 });

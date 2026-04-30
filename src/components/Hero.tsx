@@ -19,7 +19,7 @@ export default function Hero() {
               <span className="absolute inline-flex h-full w-full rounded-full bg-primary opacity-75 animate-ping" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
             </span>
-            <span className="font-mono text-xs text-muted-foreground">Now booking Q3 — 2 slots left</span>
+            <span className="font-mono text-xs text-muted-foreground">Currently booking new engagements</span>
           </motion.div>
 
           <motion.h1
@@ -28,8 +28,8 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.1 }}
             className="font-display text-6xl md:text-7xl lg:text-8xl leading-[0.95] tracking-tight"
           >
-            Growth along the<br />
-            <span className="text-aurora italic">third axis.</span>
+            Digital marketing,<br />
+            <span className="text-aurora italic">along the third axis.</span>
           </motion.h1>
 
           <motion.p
@@ -53,7 +53,7 @@ export default function Hero() {
               className="group relative inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-aurora text-background font-medium hover:scale-[1.03] transition-transform"
             >
               <span className="absolute inset-0 rounded-full bg-aurora blur-xl opacity-50 group-hover:opacity-80 transition-opacity" />
-              <span className="relative">Book a growth audit</span>
+              <span className="relative">Start a project</span>
               <span className="relative">→</span>
             </Link>
             <Link to="/work" className="font-mono text-sm text-muted-foreground hover:text-foreground transition-colors">
