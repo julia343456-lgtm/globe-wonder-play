@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import PageHeader from "@/components/PageHeader";
 import CTA from "@/components/CTA";
+import { CosmicCard } from "@/components/CosmicCard";
 
 export const Route = createFileRoute("/about")({
   component: AboutPage,
@@ -83,12 +84,13 @@ function AboutPage() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
-                className="group p-7 rounded-2xl border border-border bg-card-gradient hover:border-primary/40 transition-colors"
               >
-                <div className="aspect-square w-20 rounded-full bg-aurora mb-5 opacity-80 group-hover:scale-105 transition-transform" />
-                <div className="font-display text-2xl">{m.name}</div>
-                <div className="font-mono text-xs uppercase tracking-widest text-primary mt-1 mb-3">{m.role}</div>
-                <p className="text-muted-foreground text-sm leading-relaxed">{m.bio}</p>
+                <CosmicCard interactive className="group p-7 h-full">
+                  <div className="aspect-square w-20 rounded-full bg-aurora mb-5 opacity-80 group-hover:scale-105 transition-transform" aria-hidden="true" />
+                  <div className="font-display text-2xl">{m.name}</div>
+                  <div className="font-mono text-xs uppercase tracking-widest text-primary mt-1 mb-3">{m.role}</div>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{m.bio}</p>
+                </CosmicCard>
               </motion.div>
             ))}
           </div>
