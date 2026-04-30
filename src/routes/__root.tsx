@@ -4,7 +4,7 @@ import Footer from "@/components/Footer";
 import appCss from "../styles.css?url";
 import ogImage from "@/assets/og-image.jpg";
 
-const SITE_URL = "https://neomteckverse.com";
+const SITE_URL = "https://globe-wonder-play.lovable.app";
 const OG_IMAGE_URL = `${SITE_URL}${ogImage}`;
 
 const ORG_JSONLD = {
@@ -64,7 +64,7 @@ export const Route = createRootRoute({
     ],
     links: [
       { rel: "stylesheet", href: appCss },
-      { rel: "canonical", href: "https://neomteckverse.com" },
+      { rel: "canonical", href: SITE_URL },
     ],
     scripts: [
       {
