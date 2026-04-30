@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import PageHeader from "@/components/PageHeader";
 import CTA from "@/components/CTA";
+import { CosmicCard } from "@/components/CosmicCard";
 
 export const Route = createFileRoute("/process")({
   component: ProcessPage,
@@ -48,13 +49,13 @@ function ProcessPage() {
                 <div className="relative z-10 flex h-14 w-14 md:h-20 md:w-20 items-center justify-center rounded-full bg-aurora text-background font-mono text-sm md:text-base font-bold">
                   {s.n}
                 </div>
-                <div className="p-6 md:p-8 rounded-2xl border border-border bg-card-gradient">
+                <CosmicCard className="p-6 md:p-8">
                   <div className="flex items-baseline justify-between flex-wrap gap-2 mb-3">
                     <h3 className="font-display text-3xl md:text-4xl">{s.title}</h3>
                     <span className="font-mono text-xs uppercase tracking-widest text-primary">{s.t}</span>
                   </div>
                   <p className="text-muted-foreground leading-relaxed">{s.desc}</p>
-                </div>
+                </CosmicCard>
               </motion.div>
             ))}
           </div>
