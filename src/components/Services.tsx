@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
+import { CosmicCard } from "@/components/CosmicCard";
 
 const SERVICES = [
   {
@@ -53,22 +54,23 @@ export default function Services({ headingOnly = false }: { headingOnly?: boolea
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
               transition={{ duration: 0.6, delay: i * 0.08 }}
-              className="group relative p-8 md:p-10 rounded-2xl border border-border bg-card-gradient overflow-hidden hover:border-primary/40 transition-colors"
             >
-              <div className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-primary/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-              <div className="relative flex items-start justify-between mb-6">
-                <span className="font-mono text-xs text-muted-foreground">{s.n} / 04</span>
-                <span className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-primary">→</span>
-              </div>
-              <h3 className="relative font-display text-3xl md:text-4xl mb-4">{s.title}</h3>
-              <p className="relative text-muted-foreground leading-relaxed mb-6">{s.desc}</p>
-              <div className="relative flex flex-wrap gap-2">
-                {s.tags.map((t) => (
-                  <span key={t} className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border border-border text-muted-foreground">
-                    {t}
-                  </span>
-                ))}
-              </div>
+              <CosmicCard interactive className="group p-8 md:p-10 h-full">
+                <div className="pointer-events-none absolute -top-32 -right-32 w-64 h-64 rounded-full bg-primary/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" aria-hidden="true" />
+                <div className="relative flex items-start justify-between mb-6">
+                  <span className="font-mono text-xs text-muted-foreground">{s.n} / 04</span>
+                  <span className="opacity-0 group-hover:opacity-100 -translate-x-2 group-hover:translate-x-0 transition-all text-primary">→</span>
+                </div>
+                <h3 className="relative font-display text-3xl md:text-4xl mb-4">{s.title}</h3>
+                <p className="relative text-muted-foreground leading-relaxed mb-6">{s.desc}</p>
+                <div className="relative flex flex-wrap gap-2">
+                  {s.tags.map((t) => (
+                    <span key={t} className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border border-border text-muted-foreground">
+                      {t}
+                    </span>
+                  ))}
+                </div>
+              </CosmicCard>
             </motion.div>
           ))}
         </div>
