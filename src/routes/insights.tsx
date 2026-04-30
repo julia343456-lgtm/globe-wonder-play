@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import PageHeader from "@/components/PageHeader";
+import { CosmicCard, CardAmbient } from "@/components/CosmicCard";
+import { INSIGHTS } from "@/data/insights";
 
 export const Route = createFileRoute("/insights")({
   component: InsightsPage,
@@ -14,16 +16,9 @@ export const Route = createFileRoute("/insights")({
   }),
 });
 
-const POSTS = [
-  { tag: "Playbook", title: "The 4× ROAS playbook for sub-$50 AOV brands", time: "12 min", date: "Apr 2026" },
-  { tag: "Teardown", title: "Why every B2B site looks the same — and what to do about it", time: "8 min", date: "Apr 2026" },
-  { tag: "POV", title: "Brand vs performance is a false dichotomy", time: "6 min", date: "Mar 2026" },
-  { tag: "Playbook", title: "Building a creative engine that fuels both paid and organic", time: "14 min", date: "Mar 2026" },
-  { tag: "Teardown", title: "How Aurora 4×'d revenue without raising the budget", time: "10 min", date: "Feb 2026" },
-  { tag: "POV", title: "MMM is back. Here's how we use it weekly", time: "9 min", date: "Feb 2026" },
-];
-
 function InsightsPage() {
+  const [featured, ...rest] = INSIGHTS;
+
   return (
     <>
       <PageHeader
@@ -37,43 +32,43 @@ function InsightsPage() {
         <div className="max-w-7xl mx-auto">
           {/* Featured */}
           <Link
-            to="/insights"
-            className="group relative block mb-10 p-10 md:p-14 rounded-3xl border border-border bg-card-gradient overflow-hidden hover:border-primary/40 transition-colors"
+            to="/insights/$slug"
+            params={{ slug: featured.slug }}
+            className="group block mb-10"
           >
-            <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full bg-primary/15 blur-3xl" />
-            <div className="absolute -bottom-32 -left-32 w-96 h-96 rounded-full bg-accent/15 blur-3xl" />
-            <div className="relative">
-              <div className="flex items-center gap-3 mb-5">
-                <span className="font-mono text-[10px] uppercase tracking-[0.25em] px-3 py-1 rounded-full bg-aurora text-background">
-                  Featured
-                </span>
-                <span className="font-mono text-xs text-muted-foreground">Apr 2026 · 12 min read</span>
+            <CosmicCard interactive className="p-10 md:p-14">
+              <CardAmbient />
+              <div className="relative">
+                <div className="flex items-center gap-3 mb-5">
+                  <span className="font-mono text-[10px] uppercase tracking-[0.25em] px-3 py-1 rounded-full bg-aurora text-background">
+                    Featured
+                  </span>
+                  <span className="font-mono text-xs text-muted-foreground">{featured.date} · {featured.time} read</span>
+                </div>
+                <h2 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight max-w-3xl group-hover:text-aurora transition-colors">
+                  {featured.title}
+                </h2>
+                <p className="mt-6 max-w-xl text-muted-foreground leading-relaxed">{featured.excerpt}</p>
+                <div className="mt-8 inline-flex items-center gap-2 font-mono text-sm text-primary">
+                  Read the playbook <span className="group-hover:translate-x-1 transition-transform">→</span>
+                </div>
               </div>
-              <h2 className="font-display text-4xl md:text-6xl leading-[0.95] tracking-tight max-w-3xl group-hover:text-aurora transition-colors">
-                The 4× ROAS playbook for sub-$50 AOV brands
-              </h2>
-              <p className="mt-6 max-w-xl text-muted-foreground leading-relaxed">
-                A complete teardown of how we rebuilt the funnel for a sleep brand and quadrupled new-customer
-                revenue without raising spend.
-              </p>
-              <div className="mt-8 inline-flex items-center gap-2 font-mono text-sm text-primary">
-                Read the playbook <span className="group-hover:translate-x-1 transition-transform">→</span>
-              </div>
-            </div>
+            </CosmicCard>
           </Link>
 
           {/* Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {POSTS.slice(1).map((p, i) => (
+            {rest.map((p, i) => (
               <motion.div
-                key={p.title}
+                key={p.slug}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
               >
                 <Link
-                  to="/insights"
+                  to="/insights/$slug"
+                  params={{ slug: p.slug }}
                   className="group block h-full p-7 rounded-2xl border border-border bg-surface/30 hover:bg-card-gradient hover:border-primary/40 transition-all"
                 >
                   <div className="flex items-center gap-3 mb-5">
@@ -107,7 +102,9 @@ function InsightsPage() {
             What we shipped, what we learned, what we're reading. No fluff, no funnel.
           </p>
           <form className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <label htmlFor="newsletter-email" className="sr-only">Email address</label>
             <input
+              id="newsletter-email"
               type="email"
               required
               placeholder="you@company.com"
