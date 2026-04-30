@@ -8,7 +8,11 @@ export default function ZSlides() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const onScroll = () => {
+    let rafId = 0;
+    let queued = false;
+
+    const compute = () => {
+      queued = false;
       const sec = sectionRef.current;
       if (!sec) return;
       const rect = sec.getBoundingClientRect();
@@ -21,10 +25,18 @@ export default function ZSlides() {
         trackRef.current.style.transform = `translate3d(${-p * maxX}px, 0, 0)`;
       }
     };
-    onScroll();
+
+    const onScroll = () => {
+      if (queued) return;
+      queued = true;
+      rafId = requestAnimationFrame(compute);
+    };
+
+    compute();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
     return () => {
+      cancelAnimationFrame(rafId);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
