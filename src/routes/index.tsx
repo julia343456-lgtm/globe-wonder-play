@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import Hero from "@/components/Hero";
-import Services from "@/components/Services";
+import ZServices from "@/components/ZServices";
 import ZSlides from "@/components/ZSlides";
 import CTA from "@/components/CTA";
 
