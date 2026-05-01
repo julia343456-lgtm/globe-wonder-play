@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import { Link } from "@tanstack/react-router";
 import Hero from "@/components/Hero";
-import Services from "@/components/Services";
+import ZServices from "@/components/ZServices";
 import ZSlides from "@/components/ZSlides";
 import CTA from "@/components/CTA";
 
@@ -39,7 +39,7 @@ function Index() {
         </div>
       </section>
 
-      <Services headingOnly />
+      <ZServices />
 
       {/* Results strip */}
       <section className="relative py-32 px-6 md:px-10">
