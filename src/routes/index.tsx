@@ -39,7 +39,7 @@ function Index() {
         </div>
       </section>
 
-      <Services headingOnly />
+      <ZServices />
 
       {/* Results strip */}
       <section className="relative py-32 px-6 md:px-10">
