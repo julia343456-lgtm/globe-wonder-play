@@ -363,6 +363,8 @@ const ZServiceCard = ({
         opacity,
         transition: reducedMotion ? "none" : "transform 0.1s linear",
         boxShadow: !reducedMotion && Math.abs(dist) < 0.1 ? "var(--shadow-glow-cyan)" : "var(--shadow-elevated)",
+        pointerEvents: Math.abs(dist) > 0.35 ? "none" : "auto",
+        zIndex: Math.round(100 - Math.abs(dist) * 100),
       }}
     >
       <div className="absolute inset-0 grid-bg opacity-30" aria-hidden="true" />
