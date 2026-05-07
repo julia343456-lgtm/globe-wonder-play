@@ -356,7 +356,24 @@ const ZServiceCard = ({
     <button
       type="button"
       ref={ref}
-      onClick={onOpen}
+      onPointerDown={(e) => {
+        // Open immediately on pointer-down so a fast-moving sticky track
+        // can't swallow the click before pointerup fires.
+        if (e.button !== 0 && e.pointerType === "mouse") return;
+        e.currentTarget.focus({ preventScroll: true });
+        onOpen();
+      }}
+      onClick={(e) => {
+        // Pointer-down already opened it; swallow the synthetic click
+        // so we don't toggle state twice on touch devices.
+        e.preventDefault();
+      }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onOpen();
+        }
+      }}
       aria-haspopup="dialog"
       aria-expanded={isOpen}
       aria-label={`Open details for ${service.title}`}
