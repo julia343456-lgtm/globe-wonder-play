@@ -156,6 +156,16 @@ export default function ZServices() {
   }, []);
 
   const active = activeIndex !== null ? SERVICES[activeIndex] : null;
+  const [isPreparing, setIsPreparing] = useState(false);
+
+  // Brief skeleton window after open so the dialog reveal feels intentional
+  // and the heavy 3D track has a frame to settle before content paints.
+  useEffect(() => {
+    if (activeIndex === null) return;
+    setIsPreparing(true);
+    const t = setTimeout(() => setIsPreparing(false), reducedMotion ? 0 : 280);
+    return () => clearTimeout(t);
+  }, [activeIndex, reducedMotion]);
 
   const handleOpen = (i: number) => {
     lastTriggerRef.current = triggerRefs.current[i] ?? null;
