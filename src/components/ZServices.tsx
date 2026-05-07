@@ -355,32 +355,57 @@ const ZServiceCard = ({
   // Only the card closest to the center is interactive — prevents far cards
   // (translated deep on Z) from stealing hits, and gives a clean tap target.
   const isActive = Math.abs(dist) < 0.5 / total + 0.15;
+  const [pressed, setPressed] = useState(false);
+
+  const clearPressed = () => setPressed(false);
 
   return (
     <button
       type="button"
       ref={ref}
       onClick={onOpen}
+      onPointerDown={() => setPressed(true)}
+      onPointerUp={clearPressed}
+      onPointerLeave={clearPressed}
+      onPointerCancel={clearPressed}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
+          setPressed(true);
           onOpen();
         }
       }}
+      onKeyUp={clearPressed}
+      onBlur={clearPressed}
       aria-haspopup="dialog"
       aria-expanded={isOpen}
       aria-label={`Open details for ${service.title}`}
-      className="shrink-0 w-[70vw] md:w-[44vw] lg:w-[36vw] aspect-[4/5] rounded-3xl relative overflow-hidden border border-border bg-card-gradient text-left cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      data-pressed={pressed ? "true" : undefined}
+      className="shrink-0 w-[70vw] md:w-[44vw] lg:w-[36vw] aspect-[4/5] rounded-3xl relative overflow-hidden border border-border bg-card-gradient text-left cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background data-[pressed=true]:border-primary/70 data-[pressed=true]:brightness-110"
       style={{
-        transform: `translateZ(${z}px) rotateY(${rotY}deg) scale(${scale})`,
+        transform: `translateZ(${z}px) rotateY(${rotY}deg) scale(${pressed && isActive ? scale * 0.97 : scale})`,
         opacity,
-        transition: reducedMotion ? "none" : "transform 0.1s linear",
-        boxShadow: !reducedMotion && Math.abs(dist) < 0.1 ? "var(--shadow-glow-cyan)" : "var(--shadow-elevated)",
+        transition: reducedMotion
+          ? "none"
+          : "transform 0.12s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.12s ease, box-shadow 0.12s ease, filter 0.12s ease",
+        boxShadow:
+          pressed && isActive
+            ? "var(--shadow-glow-cyan), inset 0 0 0 1px hsl(var(--primary) / 0.5)"
+            : !reducedMotion && Math.abs(dist) < 0.1
+              ? "var(--shadow-glow-cyan)"
+              : "var(--shadow-elevated)",
         pointerEvents: isActive ? "auto" : "none",
         zIndex: isActive ? 50 : Math.round(10 - Math.abs(dist) * 10),
         touchAction: "manipulation",
+        WebkitTapHighlightColor: "transparent",
       }}
     >
+      {/* Pressed-state aurora wash so taps feel tactile on touch + mouse. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-aurora opacity-0 transition-opacity duration-150 pointer-events-none data-[on=true]:opacity-20"
+        data-on={pressed && isActive ? "true" : "false"}
+      />
       <div className="absolute inset-0 grid-bg opacity-30" aria-hidden="true" />
       <div className="absolute -top-24 -left-24 w-72 h-72 rounded-full bg-accent/30 blur-3xl" aria-hidden="true" />
       <div className="absolute -bottom-32 -right-24 w-72 h-72 rounded-full bg-primary/30 blur-3xl" aria-hidden="true" />
