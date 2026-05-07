@@ -156,6 +156,16 @@ export default function ZServices() {
   }, []);
 
   const active = activeIndex !== null ? SERVICES[activeIndex] : null;
+  const [isPreparing, setIsPreparing] = useState(false);
+
+  // Brief skeleton window after open so the dialog reveal feels intentional
+  // and the heavy 3D track has a frame to settle before content paints.
+  useEffect(() => {
+    if (activeIndex === null) return;
+    setIsPreparing(true);
+    const t = setTimeout(() => setIsPreparing(false), reducedMotion ? 0 : 280);
+    return () => clearTimeout(t);
+  }, [activeIndex, reducedMotion]);
 
   const handleOpen = (i: number) => {
     lastTriggerRef.current = triggerRefs.current[i] ?? null;
@@ -262,44 +272,84 @@ export default function ZServices() {
                 </DialogDescription>
               </DialogHeader>
 
-              <div className="grid md:grid-cols-2 gap-8 py-4">
-                <section aria-labelledby="outcomes-heading">
-                  <h3 id="outcomes-heading" className="font-mono text-[10px] uppercase tracking-widest text-primary mb-3">
-                    Outcomes
-                  </h3>
-                  <ul className="space-y-3">
-                    {active.outcomes.map((o) => (
-                      <li key={o} className="flex items-start gap-3 text-foreground/90">
-                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-aurora shrink-0" aria-hidden="true" />
-                        <span>{o}</span>
-                      </li>
+              <div className="relative min-h-[280px]" aria-busy={isPreparing}>
+                {/* Skeleton */}
+                <div
+                  aria-hidden={!isPreparing}
+                  className={`absolute inset-0 transition-opacity duration-200 ${
+                    isPreparing ? "opacity-100" : "opacity-0 pointer-events-none"
+                  }`}
+                >
+                  <div className="grid md:grid-cols-2 gap-8 py-4">
+                    {[0, 1].map((col) => (
+                      <div key={col} className="space-y-3">
+                        <div className="h-3 w-24 rounded bg-muted/40 animate-pulse" />
+                        {[0, 1, 2].map((row) => (
+                          <div key={row} className="flex items-start gap-3">
+                            <div className="mt-2 h-1.5 w-1.5 rounded-full bg-muted/60 shrink-0" />
+                            <div
+                              className="h-3 rounded bg-muted/30 animate-pulse"
+                              style={{ width: `${70 + ((row * 11 + col * 7) % 25)}%` }}
+                            />
+                          </div>
+                        ))}
+                      </div>
                     ))}
-                  </ul>
-                </section>
-                <section aria-labelledby="deliverables-heading">
-                  <h3 id="deliverables-heading" className="font-mono text-[10px] uppercase tracking-widest text-primary mb-3">
-                    Deliverables
-                  </h3>
-                  <ul className="space-y-3">
-                    {active.deliverables.map((d) => (
-                      <li key={d} className="flex items-start gap-3 text-foreground/90">
-                        <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary shrink-0" aria-hidden="true" />
-                        <span>{d}</span>
-                      </li>
+                  </div>
+                  <div className="flex flex-wrap gap-2 pt-2">
+                    {[0, 1, 2, 3].map((i) => (
+                      <div key={i} className="h-5 w-16 rounded-full bg-muted/30 animate-pulse" />
                     ))}
-                  </ul>
-                </section>
-              </div>
+                  </div>
+                  <span className="sr-only">Loading service details…</span>
+                </div>
 
-              <div className="flex flex-wrap gap-2 pb-2" aria-label="Stack and channels">
-                {active.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border border-border text-muted-foreground"
-                  >
-                    {t}
-                  </span>
-                ))}
+                {/* Content */}
+                <div
+                  className={`transition-opacity duration-300 ${
+                    isPreparing ? "opacity-0" : "opacity-100 animate-fade-in"
+                  }`}
+                >
+                  <div className="grid md:grid-cols-2 gap-8 py-4">
+                    <section aria-labelledby="outcomes-heading">
+                      <h3 id="outcomes-heading" className="font-mono text-[10px] uppercase tracking-widest text-primary mb-3">
+                        Outcomes
+                      </h3>
+                      <ul className="space-y-3">
+                        {active.outcomes.map((o) => (
+                          <li key={o} className="flex items-start gap-3 text-foreground/90">
+                            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-aurora shrink-0" aria-hidden="true" />
+                            <span>{o}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                    <section aria-labelledby="deliverables-heading">
+                      <h3 id="deliverables-heading" className="font-mono text-[10px] uppercase tracking-widest text-primary mb-3">
+                        Deliverables
+                      </h3>
+                      <ul className="space-y-3">
+                        {active.deliverables.map((d) => (
+                          <li key={d} className="flex items-start gap-3 text-foreground/90">
+                            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-primary shrink-0" aria-hidden="true" />
+                            <span>{d}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2 pb-2" aria-label="Stack and channels">
+                    {active.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="font-mono text-[10px] uppercase tracking-wider px-2.5 py-1 rounded-full border border-border text-muted-foreground"
+                      >
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-3 justify-end pt-4 border-t border-border">
