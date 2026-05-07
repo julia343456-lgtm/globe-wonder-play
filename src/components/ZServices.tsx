@@ -165,8 +165,11 @@ export default function ZServices() {
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setActiveIndex(null);
-      // Return focus to the originating card after Radix releases the trap.
-      requestAnimationFrame(() => lastTriggerRef.current?.focus());
+      // Return focus to the originating card after Radix releases the trap,
+      // using preventScroll so we don't yank the page out of the sticky track.
+      requestAnimationFrame(() =>
+        lastTriggerRef.current?.focus({ preventScroll: true }),
+      );
     }
   };
 
