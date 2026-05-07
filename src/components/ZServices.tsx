@@ -352,22 +352,15 @@ const ZServiceCard = ({
   const opacity = reducedMotion ? 1 : 1 - Math.min(0.6, Math.abs(dist) * 1.4);
   const scale = reducedMotion ? 1 : 1 - Math.min(0.25, Math.abs(dist) * 0.6);
 
+  // Only the card closest to the center is interactive — prevents far cards
+  // (translated deep on Z) from stealing hits, and gives a clean tap target.
+  const isActive = Math.abs(dist) < 0.5 / total + 0.15;
+
   return (
     <button
       type="button"
       ref={ref}
-      onPointerDown={(e) => {
-        // Open immediately on pointer-down so a fast-moving sticky track
-        // can't swallow the click before pointerup fires.
-        if (e.button !== 0 && e.pointerType === "mouse") return;
-        e.currentTarget.focus({ preventScroll: true });
-        onOpen();
-      }}
-      onClick={(e) => {
-        // Pointer-down already opened it; swallow the synthetic click
-        // so we don't toggle state twice on touch devices.
-        e.preventDefault();
-      }}
+      onClick={onOpen}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
@@ -383,8 +376,9 @@ const ZServiceCard = ({
         opacity,
         transition: reducedMotion ? "none" : "transform 0.1s linear",
         boxShadow: !reducedMotion && Math.abs(dist) < 0.1 ? "var(--shadow-glow-cyan)" : "var(--shadow-elevated)",
-        pointerEvents: Math.abs(dist) > 0.35 ? "none" : "auto",
-        zIndex: Math.round(100 - Math.abs(dist) * 100),
+        pointerEvents: isActive ? "auto" : "none",
+        zIndex: isActive ? 50 : Math.round(10 - Math.abs(dist) * 10),
+        touchAction: "manipulation",
       }}
     >
       <div className="absolute inset-0 grid-bg opacity-30" aria-hidden="true" />
