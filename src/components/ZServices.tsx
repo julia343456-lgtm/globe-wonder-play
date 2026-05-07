@@ -356,23 +356,58 @@ const ZServiceCard = ({
   // (translated deep on Z) from stealing hits, and gives a clean tap target.
   const isActive = Math.abs(dist) < 0.5 / total + 0.15;
   const [pressed, setPressed] = useState(false);
+  // Track pointer position so we only treat a release as a tap when the
+  // finger/mouse stays within ~10px — distinguishes taps from scroll gestures.
+  const pointerStart = useRef<{ x: number; y: number; id: number } | null>(null);
+  const firedRef = useRef(false);
 
   const clearPressed = () => setPressed(false);
+
+  const tryFire = () => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    onOpen();
+    // Reset shortly after so subsequent taps still work.
+    setTimeout(() => {
+      firedRef.current = false;
+    }, 400);
+  };
 
   return (
     <button
       type="button"
       ref={ref}
-      onClick={onOpen}
-      onPointerDown={() => setPressed(true)}
-      onPointerUp={clearPressed}
+      onClick={(e) => {
+        // Click is the canonical path on desktop; touch path uses pointerup.
+        e.preventDefault();
+        tryFire();
+      }}
+      onPointerDown={(e) => {
+        setPressed(true);
+        pointerStart.current = { x: e.clientX, y: e.clientY, id: e.pointerId };
+      }}
+      onPointerUp={(e) => {
+        clearPressed();
+        const start = pointerStart.current;
+        pointerStart.current = null;
+        // Touch/pen fallback: browser may swallow the synthetic click during
+        // the sticky scroll. Fire from pointerup if the gesture was a tap.
+        if (start && (e.pointerType === "touch" || e.pointerType === "pen")) {
+          const dx = e.clientX - start.x;
+          const dy = e.clientY - start.y;
+          if (Math.hypot(dx, dy) < 10) tryFire();
+        }
+      }}
       onPointerLeave={clearPressed}
-      onPointerCancel={clearPressed}
+      onPointerCancel={() => {
+        clearPressed();
+        pointerStart.current = null;
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") {
           e.preventDefault();
           setPressed(true);
-          onOpen();
+          tryFire();
         }
       }}
       onKeyUp={clearPressed}
